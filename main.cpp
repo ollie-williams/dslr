@@ -14,6 +14,22 @@ int main()
     throw err;
   }
 
+  EdsCameraListRef cameraList = nullptr;
+  err = EdsGetCameraList(&cameraList);
+  if (EDS_ERR_OK != err)
+  {
+    throw err;
+  }
+
+  EdsUInt32 cameraCount = -1;
+  err = EdsGetChildCount(cameraList, &cameraCount);
+  if (EDS_ERR_OK != err)
+  {
+    throw err;
+  }
+  std::cout << "There are " << cameraCount << " cameras connected.\n";
+
+  EdsRelease(cameraList);
 
   std::cout << "Unitializing library\n";
   EdsTerminateSDK();
