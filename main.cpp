@@ -5,6 +5,18 @@
 
 int main()
 {
-  std::cout << "Hello world.\n";
+  EdsError err;
+  
+  std::cout << "Initializing library\n";
+  err = EdsInitializeSDK();
+  if (EDS_ERR_OK != err)
+  {
+    throw err;
+  }
+
+
+  std::cout << "Unitializing library\n";
+  EdsTerminateSDK();
+  
   return 0;
 }
