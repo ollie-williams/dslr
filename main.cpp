@@ -19,7 +19,7 @@ EdsError EDSCALLBACK handlePropertyEvent(
     EdsUInt32               inParam,
     EdsVoid *               inContext )
 {
-  std::cout << "Property event.\n";
+  //std::cout << "Property event " << std::hex << inPropertyID << "\n";
   return EDS_ERR_OK;
 }
 
@@ -39,22 +39,19 @@ int main()
   
   std::cout << "Initializing library\n";
   err = EdsInitializeSDK();
-  if (EDS_ERR_OK != err)
-  {
+  if (EDS_ERR_OK != err) {
     throw err;
   }
 
   EdsCameraListRef cameraList = nullptr;
   err = EdsGetCameraList(&cameraList);
-  if (EDS_ERR_OK != err)
-  {
+  if (EDS_ERR_OK != err) {
     throw err;
   }
 
   EdsUInt32 cameraCount = -1;
   err = EdsGetChildCount(cameraList, &cameraCount);
-  if (EDS_ERR_OK != err)
-  {
+  if (EDS_ERR_OK != err) {
     throw err;
   }
   std::cout << "There are " << cameraCount << " cameras connected.\n";
@@ -63,32 +60,42 @@ int main()
 
     EdsCameraRef camera = nullptr;
     err = EdsGetChildAtIndex(cameraList, 0, &camera);
-    if (EDS_ERR_OK != err)
-    {
+    if (EDS_ERR_OK != err) {
       throw err;
     }
 
-    // Set event handler
     err = EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, handleObjectEvent, NULL);
-    if (EDS_ERR_OK != err)
-    {
+    if (EDS_ERR_OK != err) {
       throw err;
     }
     
-    // Set event handler
     err = EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, handlePropertyEvent, NULL);
-    if (EDS_ERR_OK != err)
-    {
+    if (EDS_ERR_OK != err) {
       throw err;
     }
     
-    // Set event handler
     err = EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, handleStateEvent, NULL);
-    if (EDS_ERR_OK != err)
-    {
+    if (EDS_ERR_OK != err) {
       throw err;
     }
 
+    std::cout << "Opening session.\n";
+    err = EdsOpenSession(camera);
+    if (EDS_ERR_OK != err) {
+      throw err;
+    }
+
+    std::cout << "Say cheese...\n";
+    err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);
+    if (EDS_ERR_OK != err) {
+      throw err;
+    }
+
+    std::cout << "Closing session.\n";
+    err = EdsCloseSession(camera);
+    if (EDS_ERR_OK != err) {
+      throw err;
+    }
     
     EdsRelease(camera);    
   }
