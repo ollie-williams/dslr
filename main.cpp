@@ -32,14 +32,49 @@ EdsError EDSCALLBACK handleStateEvent(
   return EDS_ERR_OK;
 }
 
+EdsError GetCurrentDevice(EdsCameraRef camera, EdsUInt32* device)
+{
+  // Get current device setting
+  return EdsGetPropertyData(camera,
+                           kEdsPropID_Evf_OutputDevice,
+                           0,
+                           sizeof(*device),
+                           device);
+}
+
+EdsError SetDevice(EdsCameraRef camera, EdsUInt32 device)
+{
+  return EdsSetPropertyData(camera,
+                           kEdsPropID_Evf_OutputDevice,
+                           0,
+                           sizeof(device),
+                           &device);
+}
+
 EdsError StartLiveView(EdsCameraRef camera)
 {
-  return EDS_ERR_OK;
+  EdsError err;  
+  EdsUInt32 device;
+  err = GetCurrentDevice(camera, &device);
+  if (EDS_ERR_OK != err) {
+    return err;
+  }
+  
+  device |= kEdsEvfOutputDevice_PC;
+  return SetDevice(camera, device);
 }
 
 EdsError EndLiveView(EdsCameraRef camera)
 {
-  return EDS_ERR_OK;
+  EdsError err;  
+  EdsUInt32 device;
+  err = GetCurrentDevice(camera, &device);
+  if (EDS_ERR_OK != err) {
+    return err;
+  }
+
+  device &= ~kEdsEvfOutputDevice_PC;
+  return SetDevice(camera, device);  
 }
 
 int main()
