@@ -19,7 +19,7 @@ EdsError EDSCALLBACK handlePropertyEvent(
     EdsUInt32               inParam,
     EdsVoid *               inContext )
 {
-  //std::cout << "Property event " << std::hex << inPropertyID << "\n";
+  std::cout << "Property event " << std::hex << inPropertyID << "\n";
   return EDS_ERR_OK;
 }
 
@@ -28,7 +28,7 @@ EdsError EDSCALLBACK handleStateEvent(
     EdsUInt32               inEventData,
     EdsVoid *               inContext )
 {
-  std::cout << "State event.\n";
+  std::cout << "State event " << std::hex << inEvent << "\n";
   return EDS_ERR_OK;
 }
 
@@ -42,30 +42,39 @@ EdsError GetCurrentDevice(EdsCameraRef camera, EdsUInt32* device)
                            device);
 }
 
-EdsError SetDevice(EdsCameraRef camera, EdsUInt32 device)
+template<EdsPropertyID PropID, typename T>
+EdsError SetProperty(EdsCameraRef camera, const T& data)
 {
   return EdsSetPropertyData(camera,
-                           kEdsPropID_Evf_OutputDevice,
-                           0,
-                           sizeof(device),
-                           &device);
+                            PropID,
+                            0,
+                            sizeof(T),
+                            &data);
+}
+
+EdsError SetDevice(EdsCameraRef camera, EdsUInt32 device)
+{
+  return SetProperty<kEdsPropID_Evf_OutputDevice>(camera, device);
 }
 
 EdsError StartLiveView(EdsCameraRef camera)
 {
+#if 0
   EdsError err;  
   EdsUInt32 device;
   err = GetCurrentDevice(camera, &device);
   if (EDS_ERR_OK != err) {
     return err;
   }
-  
+  std::cout << "Device = " << device << std::endl;
   device |= kEdsEvfOutputDevice_PC;
-  return SetDevice(camera, device);
+#endif 
+  return SetDevice(camera, kEdsEvfOutputDevice_PC);
 }
 
 EdsError EndLiveView(EdsCameraRef camera)
 {
+#if 0
   EdsError err;  
   EdsUInt32 device;
   err = GetCurrentDevice(camera, &device);
@@ -73,8 +82,9 @@ EdsError EndLiveView(EdsCameraRef camera)
     return err;
   }
 
-  device &= ~kEdsEvfOutputDevice_PC;
-  return SetDevice(camera, device);  
+  device &= ~kEdsEvfOutputDevice_TFT;
+#endif
+  return SetDevice(camera, 0);  
 }
 
 int main()
@@ -107,43 +117,46 @@ int main()
     if (EDS_ERR_OK != err) {
       throw err;
     }
-
-    err = EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, handleObjectEvent, NULL);
+    
+    err = EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, handleObjectEvent, nullptr);
     if (EDS_ERR_OK != err) {
       throw err;
     }
     
-    err = EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, handlePropertyEvent, NULL);
+    err = EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, handlePropertyEvent, nullptr);
+    if (EDS_ERR_OK != err) {
+      throw err;
+    }
+      
+    err = EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, handleStateEvent, nullptr);
     if (EDS_ERR_OK != err) {
       throw err;
     }
     
-    err = EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, handleStateEvent, NULL);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-
     std::cout << "Opening session.\n";
     err = EdsOpenSession(camera);
     if (EDS_ERR_OK != err) {
       throw err;
     }
 
+#if 0
     std::cout << "Starting live view.\n";
     err = StartLiveView(camera);
     if (EDS_ERR_OK != err) {
       throw err;
     }
+#endif
 
-    // Wait for a bit
-    sleep(3);
+    
 
+#if 0
     std::cout << "Ending live view.\n";
     err = EndLiveView(camera);
     if (EDS_ERR_OK != err) {
       throw err;
     }
-
+#endif
+    
     std::cout << "Closing session.\n";
     err = EdsCloseSession(camera);
     if (EDS_ERR_OK != err) {
