@@ -135,6 +135,9 @@ int main()
       throw err;
     }
 
+    // Wait for a bit
+    sleep(3);
+
     std::cout << "Ending live view.\n";
     err = EndLiveView(camera);
     if (EDS_ERR_OK != err) {
