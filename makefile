@@ -8,3 +8,6 @@ dslr: $(OBJS)
 
 %.o: %.cpp
 	clang++ -c -Wall -m32 -o $@ $<
+
+clean:
+	rm $(OBJS) dslr

@@ -4,11 +4,11 @@
 namespace dslr {
 
 Exception::Exception(const EdsError error)
-    : std::runtime_error(GetMessage(error))
+    : std::runtime_error(Message(error))
     , error_(error)
 {}
 
-std::string Exception::GetMessage(const EdsError error)
+std::string Exception::Message(const EdsError error)
 {
   return "todo: obtain messages";
 }
