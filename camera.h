@@ -5,10 +5,7 @@ class Exception;
 class Camera {
  public:
 
-  ~Camera()
-  {
-    EdsRelease(camera_);
-  }  
+  ~Camera();
   
   template<typename T>
   void SetProperty(const EdsPropertyID propId, const T& data)
@@ -30,6 +27,7 @@ class Camera {
 
  private:
   void Initialize();
+  void Shutdown();
 
   static EdsError EDSCALLBACK handleObjectEvent(
       EdsObjectEvent        event,

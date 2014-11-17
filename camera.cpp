@@ -5,6 +5,14 @@
 namespace dslr {
 
 
+Camera::~Camera()
+{
+  if (camera_) {
+    EdsRelease(camera_);
+    camera_ = nullptr;
+  }
+}  
+
 void Camera::Initialize()
 {
   assert(camera_);
@@ -30,6 +38,16 @@ void Camera::Initialize()
   if (EDS_ERR_OK != err) {
     throw Exception(err);
   }
+}
+
+void Camera::Shutdown()
+{
+  assert(camera_);
+
+  EdsError err = EdsCloseSession(camera_);
+  if (EDS_ERR_OK != err) {
+    throw Exception(err);
+  }  
 }
 
 EdsError EDSCALLBACK Camera::handleObjectEvent(
