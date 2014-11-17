@@ -32,6 +32,15 @@ EdsError EDSCALLBACK handleStateEvent(
   return EDS_ERR_OK;
 }
 
+EdsError StartLiveView(EdsCameraRef camera)
+{
+  return EDS_ERR_OK;
+}
+
+EdsError EndLiveView(EdsCameraRef camera)
+{
+  return EDS_ERR_OK;
+}
 
 int main()
 {
@@ -85,8 +94,14 @@ int main()
       throw err;
     }
 
-    std::cout << "Say cheese...\n";
-    err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);
+    std::cout << "Starting live view.\n";
+    err = StartLiveView(camera);
+    if (EDS_ERR_OK != err) {
+      throw err;
+    }
+
+    std::cout << "Ending live view.\n";
+    err = EndLiveView(camera);
     if (EDS_ERR_OK != err) {
       throw err;
     }
