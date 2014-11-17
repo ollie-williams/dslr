@@ -1,14 +1,12 @@
 #include <iostream>
-
-#define __MACOS__
-#include "EDSDK/Header/EDSDK.h"
+#include "base.h"
 
 EdsError EDSCALLBACK handleObjectEvent(
     EdsObjectEvent event,
     EdsBaseRef     object,
     EdsVoid*       context  )
 {
-  std::cout << "Object event.\n";
+  std::cout << "Object event " << std::hex << event << "\n";
   return EDS_ERR_OK;
 }
 
@@ -139,6 +137,12 @@ int main()
       throw err;
     }
 
+    std::cout << "Setting output device to host.\n";
+    err = SetProperty<kEdsPropID_SaveTo>(camera, kEdsSaveTo_Host);
+    if (EDS_ERR_OK != err) {
+      throw err;
+    }
+    
 #if 0
     std::cout << "Starting live view.\n";
     err = StartLiveView(camera);
@@ -147,7 +151,7 @@ int main()
     }
 #endif
 
-    
+    sleep(5);
 
 #if 0
     std::cout << "Ending live view.\n";

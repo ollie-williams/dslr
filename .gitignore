@@ -1,4 +1,5 @@
-*.out
+*.o
+dslr
 *.DS_Store
 EDSDK/Sample/
 EDSDK/Framework/
