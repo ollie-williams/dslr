@@ -1,4 +1,4 @@
-SOURCES = main.cpp dslrException.cpp camera.cpp
+SOURCES = main.cpp dslrException.cpp camera.cpp camera_list.cpp
 OBJS = $(SOURCES:.cpp=.o)
 
 all: dslr

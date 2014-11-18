@@ -1,35 +1,10 @@
-#include <iostream>
 #include "base.h"
+#include "camera_list.h"
+#include "camera.h"
 
-EdsError EDSCALLBACK handleObjectEvent(
-    EdsObjectEvent event,
-    EdsBaseRef     object,
-    EdsVoid*       context  )
-{
-  std::cout << "Object event " << std::hex << event << "\n";
-  return EDS_ERR_OK;
-}
+using namespace dslr;
 
-
-EdsError EDSCALLBACK handlePropertyEvent(
-    EdsPropertyEvent        inEvent,
-    EdsPropertyID           inPropertyID,
-    EdsUInt32               inParam,
-    EdsVoid *               inContext )
-{
-  std::cout << "Property event " << std::hex << inPropertyID << "\n";
-  return EDS_ERR_OK;
-}
-
-EdsError EDSCALLBACK handleStateEvent(
-    EdsStateEvent           inEvent,
-    EdsUInt32               inEventData,
-    EdsVoid *               inContext )
-{
-  std::cout << "State event " << std::hex << inEvent << "\n";
-  return EDS_ERR_OK;
-}
-
+#if 0
 EdsError GetCurrentDevice(EdsCameraRef camera, EdsUInt32* device)
 {
   // Get current device setting
@@ -38,16 +13,6 @@ EdsError GetCurrentDevice(EdsCameraRef camera, EdsUInt32* device)
                            0,
                            sizeof(*device),
                            device);
-}
-
-template<EdsPropertyID PropID, typename T>
-EdsError SetProperty(EdsCameraRef camera, const T& data)
-{
-  return EdsSetPropertyData(camera,
-                            PropID,
-                            0,
-                            sizeof(T),
-                            &data);
 }
 
 EdsError SetDevice(EdsCameraRef camera, EdsUInt32 device)
@@ -84,97 +49,28 @@ EdsError EndLiveView(EdsCameraRef camera)
 #endif
   return SetDevice(camera, 0);  
 }
+#endif
 
 int main()
 {
   EdsError err;
   
-  std::cout << "Initializing library\n";
   err = EdsInitializeSDK();
   if (EDS_ERR_OK != err) {
     throw err;
   }
 
-  EdsCameraListRef cameraList = nullptr;
-  err = EdsGetCameraList(&cameraList);
-  if (EDS_ERR_OK != err) {
-    throw err;
+  CameraList cameraList;
+    
+  std::cout << "There are " << cameraList.Count() << " cameras connected.\n";
+
+  if (cameraList.Count() > 0) {
+    Camera camera = cameraList.get(0);
+    camera.SetProperty(kEdsPropID_SaveTo, kEdsSaveTo_Host);
   }
-
-  EdsUInt32 cameraCount = -1;
-  err = EdsGetChildCount(cameraList, &cameraCount);
-  if (EDS_ERR_OK != err) {
-    throw err;
-  }
-  std::cout << "There are " << cameraCount << " cameras connected.\n";
-
-  if (cameraCount > 0) {
-
-    EdsCameraRef camera = nullptr;
-    err = EdsGetChildAtIndex(cameraList, 0, &camera);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
     
-    err = EdsSetObjectEventHandler(camera, kEdsObjectEvent_All, handleObjectEvent, nullptr);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-    
-    err = EdsSetPropertyEventHandler(camera, kEdsPropertyEvent_All, handlePropertyEvent, nullptr);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-      
-    err = EdsSetCameraStateEventHandler(camera, kEdsStateEvent_All, handleStateEvent, nullptr);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-    
-    std::cout << "Opening session.\n";
-    err = EdsOpenSession(camera);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
 
-    std::cout << "Setting output device to host.\n";
-    err = SetProperty<kEdsPropID_SaveTo>(camera, kEdsSaveTo_Host);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-    
-#if 0
-    std::cout << "Starting live view.\n";
-    err = StartLiveView(camera);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-#endif
-
-    sleep(5);
-
-#if 0
-    std::cout << "Ending live view.\n";
-    err = EndLiveView(camera);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-#endif
-    
-    std::cout << "Closing session.\n";
-    err = EdsCloseSession(camera);
-    if (EDS_ERR_OK != err) {
-      throw err;
-    }
-    
-    EdsRelease(camera);    
-  }
-
-  EdsRelease(cameraList);
-
-  std::cout << "Unitializing library\n";
-  EdsTerminateSDK();
-  
+  EdsTerminateSDK();  
   return 0;
 }
 

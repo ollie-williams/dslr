@@ -1,3 +1,6 @@
+#ifndef DSLR_DSLREXCEPTION
+#define DSLR_DSLREXCEPTION
+
 namespace dslr {
 
 class Exception : public std::runtime_error {  
@@ -13,3 +16,5 @@ class Exception : public std::runtime_error {
 };
 
 } // dslr
+
+#endif

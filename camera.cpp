@@ -4,10 +4,14 @@
 
 namespace dslr {
 
+Camera::Camera(EdsCameraRef camera)
+    : camera_(camera)
+{}
 
 Camera::~Camera()
 {
   if (camera_) {
+    Shutdown();
     EdsRelease(camera_);
     camera_ = nullptr;
   }
