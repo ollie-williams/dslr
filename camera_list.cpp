@@ -10,6 +10,7 @@ CameraList::CameraList()
 {  
   EdsError err = EdsGetCameraList(&list_);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
 }
@@ -27,6 +28,7 @@ int CameraList::Count() const
   EdsUInt32 count = -1;
   EdsError err =  EdsGetChildCount(list_, &count);
   if (err != EDS_ERR_OK) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
   return count;
@@ -37,6 +39,7 @@ Camera CameraList::get(const int index)
   EdsCameraRef camera = nullptr;
   EdsError err = EdsGetChildAtIndex(list_, 0, &camera);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
 

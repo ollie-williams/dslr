@@ -16,6 +16,9 @@ std::string DescribeError(const EdsError error)
     case EDS_ERR_INVALID_HANDLE:
       ss << ": invalid handle";
       break;
+    case EDS_ERR_COMM_DISCONNECTED:
+      ss << ": communications disconnected";
+      break;
     default:
       break;
   }

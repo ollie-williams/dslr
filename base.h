@@ -4,6 +4,8 @@
 #include <iostream>
 
 #define __MACOS__
+#include <CoreFoundation/CFRunLoop.h>
+#include <pthread.h>
 #include "EDSDK/Header/EDSDK.h"
 
 #define WHERESTR  "[file %s, line %d]: "

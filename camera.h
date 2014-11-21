@@ -11,11 +11,14 @@ class Camera {
   
   EdsCameraRef camera_;
   EdsStreamRef stream_;
+  bool isLive_;
   
   friend class CameraList;
   
  public:
   ~Camera();
+
+  bool IsLive() const { return isLive_; }
   
   template<typename T>
   void SetProperty(const EdsPropertyID propId, const T& data);

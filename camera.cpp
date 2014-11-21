@@ -7,6 +7,7 @@ namespace dslr {
 Camera::Camera(EdsCameraRef camera)
     : camera_(camera)
     , stream_(nullptr)
+    , isLive_(false)
 {}
 
 Camera::~Camera()
@@ -31,6 +32,7 @@ void Camera::SetCapacity(const int freeClusters, const int bytesPerSector, const
   capacity.reset = reset;
   EdsError err = EdsSetCapacity(camera_, capacity);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
 }
@@ -43,54 +45,50 @@ void Camera::Initialize()
 
   err = EdsCreateMemoryStream(0, &stream_);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
   
   err = EdsSetObjectEventHandler(camera_, kEdsObjectEvent_All, handleObjectEvent, this);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
 
   err = EdsSetPropertyEventHandler(camera_, kEdsPropertyEvent_All, handlePropertyEvent, this);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
   
   err = EdsSetCameraStateEventHandler(camera_, kEdsStateEvent_All, handleStateEvent, this);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
 
   err = EdsOpenSession(camera_);
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }
+
+  isLive_ = true;
 }
 
 void Camera::Shutdown()
 {
+  if (!isLive_) {
+    return;
+  }
+  
   assert(camera_);
-  EdsError err = EdsCloseSession(camera_);
+  const EdsError err = EdsCloseSession(camera_);
+  
   if (EDS_ERR_OK != err) {
+    DEBUGSTREAM << DescribeError(err) << std::endl;
     throw Exception(err);
   }  
-}
-
-EdsError EDSCALLBACK Camera::handleObjectEvent(
-    EdsObjectEvent event,
-    EdsBaseRef     object,
-    EdsVoid*       context  )
-{
-  Camera* camera = reinterpret_cast<Camera*>(context);
-  
-  switch(event) {
-    case kEdsObjectEvent_DirItemRequestTransfer:
-      return camera->DirItemRequestTransfer(object);
-    
-    default:
-      std::cout << "Object event " << std::hex << event << "\n";
-      return EDS_ERR_OK;
-  }
 }
 
 EdsError Camera::DirItemRequestTransfer(EdsDirectoryItemRef item)
@@ -162,6 +160,23 @@ EdsError Camera::DirItemRequestTransfer(EdsDirectoryItemRef item)
   return EDS_ERR_OK;
 }
 
+EdsError EDSCALLBACK Camera::handleObjectEvent(
+    EdsObjectEvent event,
+    EdsBaseRef     object,
+    EdsVoid*       context  )
+{
+  Camera* camera = reinterpret_cast<Camera*>(context);
+  
+  switch(event) {
+    case kEdsObjectEvent_DirItemRequestTransfer:
+      return camera->DirItemRequestTransfer(object);
+    
+    default:
+      std::cout << "Object event " << std::hex << event << "\n";
+      return EDS_ERR_OK;
+  }
+}
+
 EdsError EDSCALLBACK Camera::handlePropertyEvent(
     EdsPropertyEvent        inEvent,
     EdsPropertyID           inPropertyID,
@@ -177,16 +192,17 @@ EdsError EDSCALLBACK Camera::handleStateEvent(
     EdsUInt32               inEventData,
     EdsVoid *               inContext )
 {
+  Camera* camera = reinterpret_cast<Camera*>(inContext);
+      
   switch(inEvent) {
     case kEdsStateEvent_Shutdown:
-      std::cout << "Shutting down..." << std::endl;
-      exit(0);
+      camera->isLive_ = false;
       return EDS_ERR_OK;
     default:
       break;
   }
   
-  std::cout << "State event " << std::hex << inEvent << "\n";
+  //std::cout << "State event " << std::hex << inEvent << "\n";
   return EDS_ERR_OK;
 }
 
