@@ -10,7 +10,9 @@ Exception::Exception(const EdsError error)
 
 std::string Exception::Message(const EdsError error)
 {
-  return "todo: obtain messages";
+  std::stringstream ss;
+  ss << "Error code " << std::hex << "error";
+  return ss.str();
 }
 
 

@@ -17,6 +17,19 @@ Camera::~Camera()
   }
 }  
 
+void Camera::SetCapacity(const int freeClusters, const int bytesPerSector, const bool reset)
+{
+  EdsCapacity capacity;
+  capacity.numberOfFreeClusters = freeClusters;
+  capacity.bytesPerSector = bytesPerSector;
+  capacity.reset = reset;
+  EdsError err = EdsSetCapacity(camera_, capacity);
+  if (EDS_ERR_OK != err) {
+    throw Exception(err);
+  }
+}
+
+
 void Camera::Initialize()
 {
   assert(camera_);

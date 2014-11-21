@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <string>
+#include <sstream>
 #include <iostream>
 
 #define __MACOS__

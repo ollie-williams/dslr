@@ -8,9 +8,9 @@ namespace dslr {
 class Exception;
 
 class Camera {
-
+  
   EdsCameraRef camera_;
-
+  
   friend class CameraList;
   
  public:
@@ -21,6 +21,8 @@ class Camera {
 
   template<typename T>
   void GetProperty(const EdsPropertyID propId, T* const data) const;
+
+  void SetCapacity(const int freeClusters, const int bytesPerSector, const bool reset);
 
  private:
   Camera(EdsCameraRef camera);
@@ -61,7 +63,7 @@ void Camera::GetProperty(const EdsPropertyID propId, T* const data) const
   EdsError err = EdsGetPropertyData(camera_, propId, 0, sizeof(T), data);
   if (EDS_ERR_OK != err) {
     throw Exception(err);
-    }
+  }
 }
 
 
