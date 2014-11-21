@@ -10,6 +10,7 @@ class Exception;
 class Camera {
   
   EdsCameraRef camera_;
+  EdsStreamRef stream_;
   
   friend class CameraList;
   
@@ -44,7 +45,8 @@ class Camera {
       EdsStateEvent           inEvent,
       EdsUInt32               inEventData,
       EdsVoid *               inContext );
- 
+
+  EdsError DirItemRequestTransfer(EdsDirectoryItemRef item);
 };
 
 

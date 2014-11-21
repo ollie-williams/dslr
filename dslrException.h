@@ -3,6 +3,8 @@
 
 namespace dslr {
 
+std::string DescribeError(const EdsError error);
+
 class Exception : public std::runtime_error {  
  public:
   Exception(const EdsError error);
@@ -10,8 +12,6 @@ class Exception : public std::runtime_error {
   EdsError getError() const { return error_; }
 
  private:
-  static std::string Message(const EdsError error);
-  
   const EdsError error_;
 };
 

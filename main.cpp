@@ -19,7 +19,8 @@ void experiment()
   camera.SetCapacity(36864*9999, 512*8, true);
 
   // Wait
-  sleep(10);
+  //sleep(2);
+  while(true);
 
 }
 
