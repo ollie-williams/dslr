@@ -6,7 +6,6 @@
 #define __MACOS__
 #include "EDSDK/Header/EDSDK.h"
 
-
 #define WHERESTR  "[file %s, line %d]: "
 #define WHEREARG  __FILE__, __LINE__
 #define DEBUGPRINT2(...)       fprintf(stderr, __VA_ARGS__)

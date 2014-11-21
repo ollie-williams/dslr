@@ -2,25 +2,34 @@
 #include "camera_list.h"
 #include "camera.h"
 
+#include <CoreFoundation/CFRunLoop.h>
+
 using namespace dslr;
 
 void experiment()
 {
-  CameraList cameraList;    
+  DEBUGSTREAM << '\n';
+  CameraList cameraList;  
   std::cout << "There are " << cameraList.Count() << " cameras connected.\n";
   if (0 == cameraList.Count()) {
     return;
   }
-    
+
+  DEBUGSTREAM << '\n';
   Camera camera = cameraList.get(0);
+  DEBUGSTREAM << '\n';
 
   // Save images to host
   camera.SetProperty(kEdsPropID_SaveTo, kEdsSaveTo_Host);
+  DEBUGSTREAM << '\n';
   camera.SetCapacity(36864*9999, 512*8, true);
-
+  DEBUGSTREAM << '\n';
+  
   // Wait
   //sleep(2);
-  while(true);
+  while(true) {
+    CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, false);
+  }
 
 }
 
